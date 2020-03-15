@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Resolvers</string>
+    <string name="success">¡Has ganado!</string>
+    <string name="next">Siguiente</string>
+    <string name="restart">Empezamos de nuevo</string>
+    <string name="ok">Ok</string>
+    <string name="exit">Salir</string>
+    <string name="complete">Completo</string>
+    <string name="tips">Tips</string>
+</resources>
