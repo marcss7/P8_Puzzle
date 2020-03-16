@@ -1,22 +1,29 @@
 package edu.uoc.resolvers;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+// Esta clase representa la pantalla de juego
 public class MainActivity extends AppCompatActivity implements Runnable, View.OnTouchListener {
     PuzzleLayout puzzleLayout;
     TextView tvTips;
     ImageView ivTips;
     int squareRootNum = 2;
     int drawableId = R.mipmap.pic_02;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +41,28 @@ public class MainActivity extends AppCompatActivity implements Runnable, View.On
                 puzzleLayout.postDelayed(MainActivity.this, 800);
             }
         });
+    }
+
+    // Creamos menú selección de la barra de acción
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    // Disparamos la acción correspondiente al elegir cada opción del menú
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.ayuda:
+                //Toast.makeText(this, "Ayuda seleccionada", Toast.LENGTH_SHORT).show();
+                Intent help = new Intent(this, HelpActivity.class);
+                startActivity(help);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

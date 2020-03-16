@@ -6,8 +6,9 @@
     <string name="ok">Ok</string>
     <string name="exit">Salir</string>
     <string name="complete">Completo</string>
-    <string name="tips">Tips</string>
+    <string name="tips"></string>
     <string name="comenzar">Comenzar</string>
     <string name="aceptas_el_reto">¿Aceptas el reto?</string>
     <string name="title">TheResolvers</string>
+    <string name="url_ayuda">https://github.com/marcss7/P8_Puzzle</string>
 </resources>
