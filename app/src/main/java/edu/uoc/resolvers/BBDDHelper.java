@@ -6,7 +6,7 @@ import android.content.Context;
 
 public class BBDDHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "Scores.db";
 
     public BBDDHelper(Context context) {

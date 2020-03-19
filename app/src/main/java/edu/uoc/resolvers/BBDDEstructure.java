@@ -14,9 +14,9 @@ public class BBDDEstructure {
     public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + BBDDEstructure.TABLE_NAME + " (" +
                     BBDDEstructure._ID + " INTEGER PRIMARY KEY," +
-                    BBDDEstructure.COLUMN_DATE + " DATETIME PRIMARY," +
+                    BBDDEstructure.COLUMN_DATE + " TEXT," +
                     BBDDEstructure.COLUMN_LEVEL + " INT," +
-                    BBDDEstructure.COLUMN_POINTS + " INT)";
+                    BBDDEstructure.COLUMN_POINTS + " FLOAT)";
 
     public static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + TABLE_NAME;

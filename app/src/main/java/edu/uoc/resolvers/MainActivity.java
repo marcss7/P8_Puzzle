@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,6 +18,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
 // Esta clase representa la pantalla de juego
 public class MainActivity extends AppCompatActivity implements Runnable, View.OnTouchListener {
     PuzzleLayout puzzleLayout;
@@ -23,22 +30,55 @@ public class MainActivity extends AppCompatActivity implements Runnable, View.On
     ImageView ivTips;
     int squareRootNum = 2;
     int drawableId = R.mipmap.pic_02;
+    long tStart;
+    long tEnd;
+    long tDelta;
+    String currentDate;
+    String pattern;
+    SimpleDateFormat simpleDateFormat;
+    double elapsedSeconds;
+    private static final int SECOND_ACTIVITY_REQUEST_CODE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ivTips = (ImageView) findViewById(R.id.iv_tips);
+        ivTips = findViewById(R.id.iv_tips);
         ivTips.setImageResource(drawableId);
-        tvTips = (TextView) findViewById(R.id.tv_tips);
+        tvTips = findViewById(R.id.tv_tips);
         tvTips.setOnTouchListener(this);
-        puzzleLayout = (PuzzleLayout) findViewById(R.id.activity_swipe_card);
+        puzzleLayout = findViewById(R.id.activity_swipe_card);
         puzzleLayout.setImage(drawableId, squareRootNum);
+        // Empezamos a contar el tiempo
+        tStart = System.currentTimeMillis();
+        final BBDDHelper dbHelper = new BBDDHelper(this);
         puzzleLayout.setOnCompleteCallback(new PuzzleLayout.OnCompleteCallback() {
             @Override
             public void onComplete() {
-                Toast.makeText(MainActivity.this, R.string.next, Toast.LENGTH_LONG).show();
-                puzzleLayout.postDelayed(MainActivity.this, 800);
+                // Paramos el tiempo
+                tEnd = System.currentTimeMillis();
+                pattern = "dd/MM/yyyy";
+                simpleDateFormat = new SimpleDateFormat(pattern);
+                currentDate = simpleDateFormat.format(new Date(tEnd));
+                tDelta = tEnd - tStart;
+                elapsedSeconds = tDelta / 1000.0;
+
+                // Gets the data repository in write mode
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+                // Create a new map of values, where column names are the keys
+                ContentValues values = new ContentValues();
+                values.put(BBDDEstructure.COLUMN_DATE, String.valueOf(currentDate));
+                values.put(BBDDEstructure.COLUMN_LEVEL, squareRootNum - 1);
+                values.put(BBDDEstructure.COLUMN_POINTS, elapsedSeconds);
+
+                // Insert the new row, returning the primary key value of the new row
+                long newRowId = db.insert(BBDDEstructure.TABLE_NAME, null, values);
+
+                // Mostramos mensaje al completar puzzle
+                Toast.makeText(MainActivity.this, "¡Bravo! Tu tiempo " + elapsedSeconds + "s", Toast.LENGTH_SHORT).show();
+                // Esperamos 3 segundos para cargar el siguiente puzzle
+                puzzleLayout.postDelayed(MainActivity.this, 3000);
             }
         });
     }
@@ -56,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements Runnable, View.On
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.ayuda:
-                //Toast.makeText(this, "Ayuda seleccionada", Toast.LENGTH_SHORT).show();
+                // Se abre la WebView con la ayuda
                 Intent help = new Intent(this, HelpActivity.class);
                 startActivity(help);
                 return true;
@@ -69,8 +109,9 @@ public class MainActivity extends AppCompatActivity implements Runnable, View.On
     public void run() {
         squareRootNum++;
         drawableId++;
-        if(squareRootNum > 10){
-            Toast.makeText(MainActivity.this, R.string.complete, Toast.LENGTH_SHORT).show();
+        // Si llegamos al último puzzle muestra el dialogo del fin del juego
+        // Si no carga el siguiente puzzle
+        if(squareRootNum > 3){
             showDialog();
         }else {
             ivTips.setImageResource(drawableId);
@@ -95,6 +136,8 @@ public class MainActivity extends AppCompatActivity implements Runnable, View.On
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        Intent i = new Intent(MainActivity.this,StartActivity.class);
+                        startActivityForResult(i, SECOND_ACTIVITY_REQUEST_CODE);
                         finish();
                     }
                 }).show();

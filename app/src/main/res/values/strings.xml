@@ -11,4 +11,6 @@
     <string name="aceptas_el_reto">¿Aceptas el reto?</string>
     <string name="title">TheResolvers</string>
     <string name="url_ayuda">https://github.com/marcss7/P8_Puzzle</string>
+    <string name="scores"></string>
+    <string name="textview">Nivel Fecha \u0020\u0020\u0020\u0020\u0020Mejor t(s)</string>
 </resources>

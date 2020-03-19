@@ -3,14 +3,22 @@ package edu.uoc.resolvers;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // Esta clase representa la pantalla de bienvenida
 public class StartActivity extends AppCompatActivity {
     private Button startButton;
+    private TextView scores;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +32,36 @@ public class StartActivity extends AppCompatActivity {
                 openMainActivity();
             }
         });
+
+        scores = findViewById(R.id.scores);
+
+        BBDDHelper dbHelper = new BBDDHelper(this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                BBDDEstructure.COLUMN_DATE,
+                BBDDEstructure.COLUMN_LEVEL,
+                "MIN(" + BBDDEstructure.COLUMN_POINTS + ") as min_time"
+        };
+
+        Cursor cursor = db.query(
+                BBDDEstructure.TABLE_NAME,   // The table to query
+                projection,             // The array of columns to return (pass null to get all)
+                null,              // The columns for the WHERE clause
+                null,          // The values for the WHERE clause
+                BBDDEstructure.COLUMN_LEVEL,                   // don't group the rows
+                null,                   // don't filter by row groups
+                null               // The sort order
+        );
+
+
+        while(cursor.moveToNext()) {
+
+            scores.append(cursor.getString(1) + "     " + cursor.getString(0) + " " + String.format("%.2f", cursor.getDouble(2)).replace(".", ",") +  "\n");
+        }
+        cursor.close();
     }
 
     // Al hacer clic en el botón nos lleva a la pantalla principal del juego

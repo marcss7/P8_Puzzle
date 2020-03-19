@@ -32,7 +32,6 @@ public class PuzzleLayout extends RelativeLayout {
         init();
     }
 
-
     public PuzzleLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
@@ -75,7 +74,6 @@ public class PuzzleLayout extends RelativeLayout {
                 int leftEdge = selfLeft - mItemWidth;
                 int rightEdge = selfLeft + mItemWidth;
                 int direction = mHelper.getScrollDirection(index);
-                //Log.d(TAG, "left " + left + " index" + index + " dx " + dx + " direction " + direction);
                 switch (direction){
                     case DataHelper.L:
                         if(left <= leftEdge)
@@ -187,9 +185,7 @@ public class PuzzleLayout extends RelativeLayout {
         resource.recycle();
 
         mItemWidth = mWidth / mSquareRootNum;
-
         mItemHeight = mHeight / mSquareRootNum;
-
 
         for (int i = 0; i < mSquareRootNum; i++){
             for (int j = 0; j < mSquareRootNum; j++){
