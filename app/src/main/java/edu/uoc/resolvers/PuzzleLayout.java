@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +15,8 @@ import android.widget.RelativeLayout;
 import androidx.customview.widget.ViewDragHelper;
 
 public class PuzzleLayout extends RelativeLayout {
-    private ViewDragHelper viewDragHelper;
-    private static final String TAG = PuzzleLayout.class.getSimpleName();
-    private DataHelper mHelper;
+    private ViewDragHelper vdh;
+    private PuzzleHelper mHelper;
     private int mDrawableId;
     private int mSquareRootNum;
     private int mHeight;
@@ -56,26 +54,26 @@ public class PuzzleLayout extends RelativeLayout {
                 return false;
             }
         });
-        mHelper = new DataHelper();
+        mHelper = new PuzzleHelper();
 
-        viewDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
+        vdh = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override
             public boolean tryCaptureView(View child, int pointerId) {
                 int index = indexOfChild(child);
-                return mHelper.getScrollDirection(index) != DataHelper.N;
+                return mHelper.obtenerPosicionDesplazamiento(index) != PuzzleHelper.POSICION_ACTUAL;
             }
 
             @Override
             public int clampViewPositionHorizontal(View child, int left, int dx) {
 
                 int index = indexOfChild(child);
-                int position = mHelper.getModel(index).position;
+                int position = mHelper.obtenerPieza(index).posicion;
                 int selfLeft = (position % mSquareRootNum) * mItemWidth;
                 int leftEdge = selfLeft - mItemWidth;
                 int rightEdge = selfLeft + mItemWidth;
-                int direction = mHelper.getScrollDirection(index);
+                int direction = mHelper.obtenerPosicionDesplazamiento(index);
                 switch (direction){
-                    case DataHelper.L:
+                    case PuzzleHelper.IZQUIERDA:
                         if(left <= leftEdge)
                             return leftEdge;
                         else if(left >= selfLeft)
@@ -83,7 +81,7 @@ public class PuzzleLayout extends RelativeLayout {
                         else
                             return left;
 
-                    case DataHelper.R:
+                    case PuzzleHelper.DERECHA:
                         if(left >= rightEdge)
                             return rightEdge;
                         else if (left <= selfLeft)
@@ -98,23 +96,23 @@ public class PuzzleLayout extends RelativeLayout {
             @Override
             public int clampViewPositionVertical(View child, int top, int dy) {
                 int index = indexOfChild(child);
-                Block model = mHelper.getModel(index);
-                int position = model.position;
+                Pieza model = mHelper.obtenerPieza(index);
+                int position = model.posicion;
 
                 int selfTop = (position / mSquareRootNum) * mItemHeight;
                 int topEdge = selfTop - mItemHeight;
                 int bottomEdge = selfTop + mItemHeight;
-                int direction = mHelper.getScrollDirection(index);
+                int direction = mHelper.obtenerPosicionDesplazamiento(index);
                 //Log.d(TAG, "top " + top + " index " + index + " direction " + direction);
                 switch (direction){
-                    case DataHelper.T:
+                    case PuzzleHelper.ARRIBA:
                         if(top <= topEdge)
                             return topEdge;
                         else if (top >= selfTop)
                             return selfTop;
                         else
                             return top;
-                    case DataHelper.B:
+                    case PuzzleHelper.ABAJO:
                         if(top >= bottomEdge)
                             return bottomEdge;
                         else if (top <= selfTop)
@@ -128,11 +126,10 @@ public class PuzzleLayout extends RelativeLayout {
 
             @Override
             public void onViewReleased(View releasedChild, float xvel, float yvel) {
-                Log.d(TAG, "xvel " + xvel + " yvel " + yvel);
                 int index = indexOfChild(releasedChild);
-                boolean isCompleted = mHelper.swapValueWithInvisibleModel(index);
-                Block item =  mHelper.getModel(index);
-                viewDragHelper.settleCapturedViewAt(item.hPosition * mItemWidth, item.vPosition * mItemHeight);
+                boolean isCompleted = mHelper.intercambiarPosicionConPiezaVacia(index);
+                Pieza item =  mHelper.obtenerPieza(index);
+                vdh.settleCapturedViewAt(item.phorizontal * mItemWidth, item.pvertical * mItemHeight);
                 View invisibleView = getChildAt(0);
                 ViewGroup.LayoutParams layoutParams = invisibleView.getLayoutParams();
                 invisibleView.setLayoutParams(releasedChild.getLayoutParams());
@@ -148,18 +145,18 @@ public class PuzzleLayout extends RelativeLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event){
-        return viewDragHelper.shouldInterceptTouchEvent(event);
+        return vdh.shouldInterceptTouchEvent(event);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        viewDragHelper.processTouchEvent(event);
+        vdh.processTouchEvent(event);
         return true;
     }
 
     @Override
     public void computeScroll() {
-        if(viewDragHelper.continueSettling(true)) {
+        if(vdh.continueSettling(true)) {
             invalidate();
         }
     }
@@ -172,9 +169,11 @@ public class PuzzleLayout extends RelativeLayout {
         }
     }
 
+    // Correspondencia uno a uno entre el índice de Vista hijo y el índice de modelos en mHelper.
+    // El modelo actualiza la posición actual sincrónicamente cada vez que se intercambia la posición de vista secundaria.
     private void createChildren(){
         removeAllViews();
-        mHelper.setSquareRootNum(mSquareRootNum);
+        mHelper.establecerNumeroCortes(mSquareRootNum);
 
         DisplayMetrics dm = getResources().getDisplayMetrics();
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -189,8 +188,6 @@ public class PuzzleLayout extends RelativeLayout {
 
         for (int i = 0; i < mSquareRootNum; i++){
             for (int j = 0; j < mSquareRootNum; j++){
-                Log.d(TAG, "mItemWidth * x " + (mItemWidth * i));
-                Log.d(TAG, "mItemWidth * y " + (mItemWidth * j));
                 ImageView iv = new ImageView(getContext());
                 iv.setScaleType(ImageView.ScaleType.FIT_XY);
                 RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -210,12 +207,12 @@ public class PuzzleLayout extends RelativeLayout {
         View invisibleView = getChildAt(0);
         View neighbor;
         for (int i = 0; i < num; i ++){
-            int neighborPosition = mHelper.findNeighborIndexOfInvisibleModel();
+            int neighborPosition = mHelper.encontrarIndiceVecinoPiezaVacia();
             ViewGroup.LayoutParams invisibleLp = invisibleView.getLayoutParams();
             neighbor = getChildAt(neighborPosition);
             invisibleView.setLayoutParams(neighbor.getLayoutParams());
             neighbor.setLayoutParams(invisibleLp);
-            mHelper.swapValueWithInvisibleModel(neighborPosition);
+            mHelper.intercambiarPosicionConPiezaVacia(neighborPosition);
         }
         invisibleView.setVisibility(INVISIBLE);
     }

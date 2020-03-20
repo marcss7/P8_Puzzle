@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements Runnable, View.On
                 long newRowId = db.insert(BBDDEstructure.TABLE_NAME, null, values);
 
                 // Mostramos mensaje al completar puzzle
-                Toast.makeText(MainActivity.this, "¡Bravo! Tu tiempo " + elapsedSeconds + "s", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "¡Bravo! Tu tiempo " + String.format("%.2f", elapsedSeconds).replace(".", ",") + "s", Toast.LENGTH_SHORT).show();
                 // Esperamos 3 segundos para cargar el siguiente puzzle
                 puzzleLayout.postDelayed(MainActivity.this, 3000);
             }
