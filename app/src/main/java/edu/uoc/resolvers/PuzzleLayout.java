@@ -3,6 +3,7 @@ package edu.uoc.resolvers;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -180,7 +181,7 @@ public class PuzzleLayout extends RelativeLayout {
         options.inDensity = dm.densityDpi;
 
         Bitmap resource = BitmapFactory.decodeResource(getResources(), mDrawableId, options);
-        Bitmap bitmap = BitmapUtil.zoomImg(resource, mWidth, mHeight);
+        Bitmap bitmap = escalarImagen(resource, mWidth, mHeight);
         resource.recycle();
 
         mItemWidth = mWidth / mSquareRootNum;
@@ -200,6 +201,16 @@ public class PuzzleLayout extends RelativeLayout {
             }
         }
         randomOrder();
+    }
+
+    private Bitmap escalarImagen(Bitmap bm, int newWidth , int newHeight) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+        return Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
     }
 
     public void randomOrder(){
