@@ -7,13 +7,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 // Esta clase representa la pantalla de bienvenida
 public class StartActivity extends AppCompatActivity {
@@ -41,17 +37,17 @@ public class StartActivity extends AppCompatActivity {
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
-                BBDDEstructure.COLUMN_DATE,
-                BBDDEstructure.COLUMN_LEVEL,
-                "MIN(" + BBDDEstructure.COLUMN_POINTS + ") as min_time"
+                BBDDEsquema.COLUMNA_FECHA,
+                BBDDEsquema.COLUMNA_NIVEL,
+                "MIN(" + BBDDEsquema.COLUMNA_PUNTOS + ") as min_time"
         };
 
         Cursor cursor = db.query(
-                BBDDEstructure.TABLE_NAME,   // The table to query
+                BBDDEsquema.NOMBRE_TABLA,   // The table to query
                 projection,             // The array of columns to return (pass null to get all)
                 null,              // The columns for the WHERE clause
                 null,          // The values for the WHERE clause
-                BBDDEstructure.COLUMN_LEVEL,                   // don't group the rows
+                BBDDEsquema.COLUMNA_NIVEL,                   // don't group the rows
                 null,                   // don't filter by row groups
                 null               // The sort order
         );

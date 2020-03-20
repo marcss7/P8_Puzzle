@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -68,12 +67,12 @@ public class MainActivity extends AppCompatActivity implements Runnable, View.On
 
                 // Create a new map of values, where column names are the keys
                 ContentValues values = new ContentValues();
-                values.put(BBDDEstructure.COLUMN_DATE, String.valueOf(currentDate));
-                values.put(BBDDEstructure.COLUMN_LEVEL, squareRootNum - 1);
-                values.put(BBDDEstructure.COLUMN_POINTS, elapsedSeconds);
+                values.put(BBDDEsquema.COLUMNA_FECHA, String.valueOf(currentDate));
+                values.put(BBDDEsquema.COLUMNA_NIVEL, squareRootNum - 1);
+                values.put(BBDDEsquema.COLUMNA_PUNTOS, elapsedSeconds);
 
                 // Insert the new row, returning the primary key value of the new row
-                long newRowId = db.insert(BBDDEstructure.TABLE_NAME, null, values);
+                long newRowId = db.insert(BBDDEsquema.NOMBRE_TABLA, null, values);
 
                 // Mostramos mensaje al completar puzzle
                 Toast.makeText(MainActivity.this, "¡Bravo! Tu tiempo " + String.format("%.2f", elapsedSeconds).replace(".", ",") + "s", Toast.LENGTH_SHORT).show();
