@@ -15,15 +15,20 @@ import android.widget.RelativeLayout;
 
 import androidx.customview.widget.ViewDragHelper;
 
+/*
+    Esta clase nos permite especificar como se posicionan unas piezas
+    con respecto a otras y en relación al elemento padre que las contiene.
+ */
 public class PuzzleLayout extends RelativeLayout {
-    private ViewDragHelper vdh;
+
+    private ViewDragHelper vdh; // Este objeto va a manejar los movimientos de las piezas
     private PuzzleHelper ph;
-    private int mDrawableId;
+    private int idImagen;
     private int numCortes;
-    private int mHeight;
-    private int mWidth;
-    private int mItemWidth;
-    private int mItemHeight;
+    private int alturaImagen;
+    private int anchuraImagen;
+    private int anchuraPieza;
+    private int alturaPieza;
     private OnCompleteCallback occ;
 
     public PuzzleLayout(Context context) {
@@ -46,98 +51,107 @@ public class PuzzleLayout extends RelativeLayout {
         getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
-                mHeight = getHeight();
-                mWidth = getWidth();
+                alturaImagen = getHeight();
+                anchuraImagen = getWidth();
                 getViewTreeObserver().removeOnPreDrawListener(this);
-                if(mDrawableId != 0 && numCortes != 0){
-                    createChildren();
+                if(idImagen != 0 && numCortes != 0){
+                    crearPiezas();
                 }
                 return false;
             }
         });
+
         ph = new PuzzleHelper();
 
         vdh = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
+
+            // Este método permite captura la pieza que queremos mover
             @Override
             public boolean tryCaptureView(View child, int pointerId) {
-                int index = indexOfChild(child);
-                return ph.obtenerPosicionDesplazamiento(index) != PuzzleHelper.POSICION_ACTUAL;
+                int indice = indexOfChild(child);
+                return ph.obtenerPosicionDesplazamiento(indice) != PuzzleHelper.POSICION_ACTUAL;
             }
 
+            // Este método controla los movimientos horizontales de las piezas
             @Override
-            public int clampViewPositionHorizontal(View child, int left, int dx) {
+            public int clampViewPositionHorizontal(View child, int izquierda, int dx) {
 
-                int index = indexOfChild(child);
-                int position = ph.obtenerPieza(index).posicion;
-                int selfLeft = (position % numCortes) * mItemWidth;
-                int leftEdge = selfLeft - mItemWidth;
-                int rightEdge = selfLeft + mItemWidth;
-                int direction = ph.obtenerPosicionDesplazamiento(index);
+                int indice = indexOfChild(child);
+                int posicion = ph.obtenerPieza(indice).posicion;
+                int izquierdaPieza = (posicion % numCortes) * anchuraPieza;
+                int bordeIzquierdo = izquierdaPieza - anchuraPieza;
+                int bordeDerecho = izquierdaPieza + anchuraPieza;
+                int direction = ph.obtenerPosicionDesplazamiento(indice);
+
                 switch (direction){
                     case PuzzleHelper.IZQUIERDA:
-                        if(left <= leftEdge)
-                            return leftEdge;
-                        else if(left >= selfLeft)
-                            return selfLeft;
+                        if(izquierda <= bordeIzquierdo)
+                            return bordeIzquierdo;
+                        else if(izquierda >= izquierdaPieza)
+                            return izquierdaPieza;
                         else
-                            return left;
+                            return izquierda;
 
                     case PuzzleHelper.DERECHA:
-                        if(left >= rightEdge)
-                            return rightEdge;
-                        else if (left <= selfLeft)
-                            return selfLeft;
+                        if(izquierda >= bordeDerecho)
+                            return bordeDerecho;
+                        else if (izquierda <= izquierdaPieza)
+                            return izquierdaPieza;
                         else
-                            return left;
+                            return izquierda;
                     default:
-                        return selfLeft;
+                        return izquierdaPieza;
                 }
             }
 
+            // Este método controla los movimientos verticales de las piezas
             @Override
-            public int clampViewPositionVertical(View child, int top, int dy) {
-                int index = indexOfChild(child);
-                Pieza model = ph.obtenerPieza(index);
-                int position = model.posicion;
+            public int clampViewPositionVertical(View child, int arriba, int dy) {
+                int indice = indexOfChild(child);
+                Pieza pieza = ph.obtenerPieza(indice);
+                int posicion = pieza.posicion;
 
-                int selfTop = (position / numCortes) * mItemHeight;
-                int topEdge = selfTop - mItemHeight;
-                int bottomEdge = selfTop + mItemHeight;
-                int direction = ph.obtenerPosicionDesplazamiento(index);
-                //Log.d(TAG, "top " + top + " index " + index + " direction " + direction);
-                switch (direction){
+                int arribaPieza = (posicion / numCortes) * alturaPieza;
+                int bordeSuperior = arribaPieza - alturaPieza;
+                int bordeInferior = arribaPieza + alturaPieza;
+                int direccion = ph.obtenerPosicionDesplazamiento(indice);
+
+                switch (direccion){
                     case PuzzleHelper.ARRIBA:
-                        if(top <= topEdge)
-                            return topEdge;
-                        else if (top >= selfTop)
-                            return selfTop;
+                        if(arriba <= bordeSuperior)
+                            return bordeSuperior;
+                        else if (arriba >= arribaPieza)
+                            return arribaPieza;
                         else
-                            return top;
+                            return arriba;
                     case PuzzleHelper.ABAJO:
-                        if(top >= bottomEdge)
-                            return bottomEdge;
-                        else if (top <= selfTop)
-                            return selfTop;
+                        if(arriba >= bordeInferior)
+                            return bordeInferior;
+                        else if (arriba <= arribaPieza)
+                            return arribaPieza;
                         else
-                            return top;
+                            return arriba;
                     default:
-                        return selfTop;
+                        return arribaPieza;
                 }
             }
 
+            // Este método controla lo que ocurre cuando soltamos la pieza que queremos mover
             @Override
             public void onViewReleased(View releasedChild, float xvel, float yvel) {
-                int index = indexOfChild(releasedChild);
-                boolean isCompleted = ph.intercambiarPosicionConPiezaVacia(index);
-                Pieza item =  ph.obtenerPieza(index);
-                vdh.settleCapturedViewAt(item.phorizontal * mItemWidth, item.pvertical * mItemHeight);
-                View invisibleView = getChildAt(0);
-                ViewGroup.LayoutParams layoutParams = invisibleView.getLayoutParams();
-                invisibleView.setLayoutParams(releasedChild.getLayoutParams());
-                releasedChild.setLayoutParams(layoutParams);
+                int indice = indexOfChild(releasedChild);
+                boolean estaCompleto = ph.intercambiarPosicionConPiezaVacia(indice);
+                Pieza pieza =  ph.obtenerPieza(indice);
+                vdh.settleCapturedViewAt(pieza.phorizontal * anchuraPieza, pieza.pvertical * alturaPieza);
+                View piezaVacia = getChildAt(0);
+                ViewGroup.LayoutParams lp = piezaVacia.getLayoutParams();
+
+                piezaVacia.setLayoutParams(releasedChild.getLayoutParams());
+                releasedChild.setLayoutParams(lp);
                 invalidate();
-                if(isCompleted){
-                    invisibleView.setVisibility(VISIBLE);
+
+                if(estaCompleto){
+                    piezaVacia.setVisibility(VISIBLE);
                     occ.onComplete();
                 }
             }
@@ -162,17 +176,18 @@ public class PuzzleLayout extends RelativeLayout {
         }
     }
 
-    public void setImage(int drawableId, int squareRootNum){
-        this.numCortes = squareRootNum;
-        this.mDrawableId = drawableId;
-        if(mWidth != 0 && mHeight != 0){
-            createChildren();
+    // Esté método trocea la imagen que toca en función
+    // del número de cortes que se le pasan por parámetro.
+    public void establecerImagen(int idImagen, int numCortes){
+        this.numCortes = numCortes;
+        this.idImagen = idImagen;
+        if(anchuraImagen != 0 && alturaImagen != 0){
+            crearPiezas();
         }
     }
 
-    // Correspondencia uno a uno entre el índice de Vista hijo y el índice de modelos en mHelper.
-    // El modelo actualiza la posición actual sincrónicamente cada vez que se intercambia la posición de vista secundaria.
-    private void createChildren(){
+    // Este método crea las piezas del puzzle y las desordena.
+    private void crearPiezas(){
         removeAllViews();
         ph.establecerNumeroCortes(numCortes);
 
@@ -180,54 +195,59 @@ public class PuzzleLayout extends RelativeLayout {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inDensity = dm.densityDpi;
 
-        Bitmap resource = BitmapFactory.decodeResource(getResources(), mDrawableId, options);
-        Bitmap bitmap = escalarImagen(resource, mWidth, mHeight);
+        Bitmap resource = BitmapFactory.decodeResource(getResources(), idImagen, options);
+        Bitmap bitmap = escalarImagen(resource, anchuraImagen, alturaImagen);
         resource.recycle();
 
-        mItemWidth = mWidth / numCortes;
-        mItemHeight = mHeight / numCortes;
+        anchuraPieza = anchuraImagen / numCortes;
+        alturaPieza = alturaImagen / numCortes;
 
         for (int i = 0; i < numCortes; i++){
             for (int j = 0; j < numCortes; j++){
                 ImageView iv = new ImageView(getContext());
                 iv.setScaleType(ImageView.ScaleType.FIT_XY);
                 RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                lp.leftMargin = j * mItemWidth;
-                lp.topMargin = i * mItemHeight;
+                lp.leftMargin = j * anchuraPieza;
+                lp.topMargin = i * alturaPieza;
                 iv.setLayoutParams(lp);
-                Bitmap b = Bitmap.createBitmap(bitmap, lp.leftMargin, lp.topMargin, mItemWidth, mItemHeight);
+                Bitmap b = Bitmap.createBitmap(bitmap, lp.leftMargin, lp.topMargin, anchuraPieza, alturaPieza);
                 iv.setImageBitmap(b);
                 addView(iv);
             }
         }
-        randomOrder();
+        desordenarPiezas();
     }
 
-    private Bitmap escalarImagen(Bitmap bm, int newWidth , int newHeight) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        return Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
+    // Este método escala la imagen para adaptarla a la pantalla.
+    private Bitmap escalarImagen(Bitmap bm, int nuevaAnchura , int nuevaAltura) {
+        int ancho = bm.getWidth();
+        int alto = bm.getHeight();
+        float escaladoAncho = ((float) nuevaAnchura) / ancho;
+        float escaladoAlto = ((float) nuevaAltura) / alto;
+        Matrix matriz = new Matrix();
+        matriz.postScale(escaladoAncho, escaladoAlto);
+        return Bitmap.createBitmap(bm, 0, 0, ancho, alto, matriz, true);
     }
 
-    public void randomOrder(){
+    // Este método desordena las piezas.
+    public void desordenarPiezas(){
         int num = numCortes * numCortes * 8;
-        View invisibleView = getChildAt(0);
-        View neighbor;
+        View piezaVacia = getChildAt(0);
+        View vistaVecina;
+
         for (int i = 0; i < num; i ++){
-            int neighborPosition = ph.encontrarIndiceVecinoPiezaVacia();
-            ViewGroup.LayoutParams invisibleLp = invisibleView.getLayoutParams();
-            neighbor = getChildAt(neighborPosition);
-            invisibleView.setLayoutParams(neighbor.getLayoutParams());
-            neighbor.setLayoutParams(invisibleLp);
-            ph.intercambiarPosicionConPiezaVacia(neighborPosition);
+            int posicionVecina = ph.encontrarIndiceVecinoPiezaVacia();
+            ViewGroup.LayoutParams lpPiezaVacia = piezaVacia.getLayoutParams();
+            vistaVecina = getChildAt(posicionVecina);
+            piezaVacia.setLayoutParams(vistaVecina.getLayoutParams());
+            vistaVecina.setLayoutParams(lpPiezaVacia);
+            ph.intercambiarPosicionConPiezaVacia(posicionVecina);
         }
-        invisibleView.setVisibility(INVISIBLE);
+
+        piezaVacia.setVisibility(INVISIBLE);
     }
 
+    // Este método dispara los acontecimientos que ocurren cuando se completa el puzzle.
     public void setOnCompleteCallback(OnCompleteCallback onCompleteCallback){
         occ = onCompleteCallback;
     }
@@ -235,4 +255,5 @@ public class PuzzleLayout extends RelativeLayout {
     public interface OnCompleteCallback{
         void onComplete();
     }
+
 }

@@ -30,18 +30,20 @@ public class ActividadPrincipal extends AppCompatActivity implements Runnable {
     SimpleDateFormat sdf;
     double segTranscurridos;
     private static final int SECOND_ACTIVITY_REQUEST_CODE = 0;
-    private static final int NIVELES = 2;
+    private static final int NIVELES = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.actividad_principal);
         pl = findViewById(R.id.tablero_juego);
-        pl.setImage(imagen, numCortes);
+        pl.establecerImagen(imagen, numCortes);
 
         // Empezamos a contar el tiempo
         tInicio = System.currentTimeMillis();
         final BBDDHelper dbHelper = new BBDDHelper(this);
+
+        // Cuando se completa el puzzle
         pl.setOnCompleteCallback(new PuzzleLayout.OnCompleteCallback() {
             @Override
             public void onComplete() {
@@ -103,7 +105,7 @@ public class ActividadPrincipal extends AppCompatActivity implements Runnable {
         if(numCortes > NIVELES + 1){
             showDialog();
         }else {
-            pl.setImage(imagen, numCortes);
+            pl.establecerImagen(imagen, numCortes);
         }
     }
 
@@ -118,7 +120,7 @@ public class ActividadPrincipal extends AppCompatActivity implements Runnable {
                             public void onClick(DialogInterface dialog, int which) {
                                 numCortes = 2;
                                 imagen = R.mipmap.img_02;
-                                pl.setImage(imagen, numCortes);
+                                pl.establecerImagen(imagen, numCortes);
                                 tInicio = System.currentTimeMillis();
                             }
                         }).setNegativeButton(R.string.salir,
