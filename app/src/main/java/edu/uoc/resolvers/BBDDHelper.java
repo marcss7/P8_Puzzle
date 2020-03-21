@@ -9,10 +9,10 @@ import android.content.Context;
  */
 public class BBDDHelper extends SQLiteOpenHelper {
     // Si cambiamos el esquema de la BBDD es necesario incrementar la versión.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "Puntuaciones.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "Puntuaciones.db";
 
-    public BBDDHelper(Context context) {
+    BBDDHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

@@ -5,13 +5,13 @@ package edu.uoc.resolvers;
    el puzzle y que es necesario recolocar para resolverlo.
  */
 
-public class Pieza {
+class Pieza {
 
-    public int posicion;
-    public int pvertical;
-    public int phorizontal;
+    int posicion;
+    int pvertical;
+    int phorizontal;
 
-    public Pieza(int posicion, int pvertical, int phorizontal){
+    Pieza(int posicion, int pvertical, int phorizontal){
         this.posicion = posicion;
         this.pvertical = pvertical;
         this.phorizontal = phorizontal;

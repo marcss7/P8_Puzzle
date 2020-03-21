@@ -17,7 +17,7 @@ public class ActividadAyuda extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.actividad_ayuda);
 
-        vistaAyuda = (WebView) findViewById(R.id.actividadAyuda);
+        vistaAyuda = findViewById(R.id.actividadAyuda);
         vistaAyuda.setWebViewClient(new WebViewClient());
         vistaAyuda.loadUrl(getString(R.string.url_ayuda));
     }

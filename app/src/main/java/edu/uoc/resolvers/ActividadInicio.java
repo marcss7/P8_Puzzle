@@ -15,15 +15,13 @@ import android.widget.TextView;
  */
 public class ActividadInicio extends AppCompatActivity {
 
-    private Button botonInicio;
-    private TextView puntuaciones;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.actividad_inicio);
         getWindow().getDecorView().setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        botonInicio = findViewById(R.id.botonInicio);
+
+        Button botonInicio = findViewById(R.id.botonInicio);
         botonInicio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -31,7 +29,7 @@ public class ActividadInicio extends AppCompatActivity {
             }
         });
 
-        puntuaciones = findViewById(R.id.puntuaciones);
+        TextView puntuaciones = findViewById(R.id.puntuaciones);
 
         BBDDHelper dbHelper = new BBDDHelper(this);
         SQLiteDatabase db = dbHelper.getReadableDatabase();

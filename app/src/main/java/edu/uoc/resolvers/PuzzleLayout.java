@@ -17,14 +17,14 @@ import androidx.customview.widget.ViewDragHelper;
 
 public class PuzzleLayout extends RelativeLayout {
     private ViewDragHelper vdh;
-    private PuzzleHelper mHelper;
+    private PuzzleHelper ph;
     private int mDrawableId;
-    private int mSquareRootNum;
+    private int numCortes;
     private int mHeight;
     private int mWidth;
     private int mItemWidth;
     private int mItemHeight;
-    private OnCompleteCallback mOnCompleteCallback;
+    private OnCompleteCallback occ;
 
     public PuzzleLayout(Context context) {
         super(context);
@@ -49,30 +49,30 @@ public class PuzzleLayout extends RelativeLayout {
                 mHeight = getHeight();
                 mWidth = getWidth();
                 getViewTreeObserver().removeOnPreDrawListener(this);
-                if(mDrawableId != 0 && mSquareRootNum != 0){
+                if(mDrawableId != 0 && numCortes != 0){
                     createChildren();
                 }
                 return false;
             }
         });
-        mHelper = new PuzzleHelper();
+        ph = new PuzzleHelper();
 
         vdh = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override
             public boolean tryCaptureView(View child, int pointerId) {
                 int index = indexOfChild(child);
-                return mHelper.obtenerPosicionDesplazamiento(index) != PuzzleHelper.POSICION_ACTUAL;
+                return ph.obtenerPosicionDesplazamiento(index) != PuzzleHelper.POSICION_ACTUAL;
             }
 
             @Override
             public int clampViewPositionHorizontal(View child, int left, int dx) {
 
                 int index = indexOfChild(child);
-                int position = mHelper.obtenerPieza(index).posicion;
-                int selfLeft = (position % mSquareRootNum) * mItemWidth;
+                int position = ph.obtenerPieza(index).posicion;
+                int selfLeft = (position % numCortes) * mItemWidth;
                 int leftEdge = selfLeft - mItemWidth;
                 int rightEdge = selfLeft + mItemWidth;
-                int direction = mHelper.obtenerPosicionDesplazamiento(index);
+                int direction = ph.obtenerPosicionDesplazamiento(index);
                 switch (direction){
                     case PuzzleHelper.IZQUIERDA:
                         if(left <= leftEdge)
@@ -97,13 +97,13 @@ public class PuzzleLayout extends RelativeLayout {
             @Override
             public int clampViewPositionVertical(View child, int top, int dy) {
                 int index = indexOfChild(child);
-                Pieza model = mHelper.obtenerPieza(index);
+                Pieza model = ph.obtenerPieza(index);
                 int position = model.posicion;
 
-                int selfTop = (position / mSquareRootNum) * mItemHeight;
+                int selfTop = (position / numCortes) * mItemHeight;
                 int topEdge = selfTop - mItemHeight;
                 int bottomEdge = selfTop + mItemHeight;
-                int direction = mHelper.obtenerPosicionDesplazamiento(index);
+                int direction = ph.obtenerPosicionDesplazamiento(index);
                 //Log.d(TAG, "top " + top + " index " + index + " direction " + direction);
                 switch (direction){
                     case PuzzleHelper.ARRIBA:
@@ -128,8 +128,8 @@ public class PuzzleLayout extends RelativeLayout {
             @Override
             public void onViewReleased(View releasedChild, float xvel, float yvel) {
                 int index = indexOfChild(releasedChild);
-                boolean isCompleted = mHelper.intercambiarPosicionConPiezaVacia(index);
-                Pieza item =  mHelper.obtenerPieza(index);
+                boolean isCompleted = ph.intercambiarPosicionConPiezaVacia(index);
+                Pieza item =  ph.obtenerPieza(index);
                 vdh.settleCapturedViewAt(item.phorizontal * mItemWidth, item.pvertical * mItemHeight);
                 View invisibleView = getChildAt(0);
                 ViewGroup.LayoutParams layoutParams = invisibleView.getLayoutParams();
@@ -138,7 +138,7 @@ public class PuzzleLayout extends RelativeLayout {
                 invalidate();
                 if(isCompleted){
                     invisibleView.setVisibility(VISIBLE);
-                    mOnCompleteCallback.onComplete();
+                    occ.onComplete();
                 }
             }
         });
@@ -163,7 +163,7 @@ public class PuzzleLayout extends RelativeLayout {
     }
 
     public void setImage(int drawableId, int squareRootNum){
-        this.mSquareRootNum = squareRootNum;
+        this.numCortes = squareRootNum;
         this.mDrawableId = drawableId;
         if(mWidth != 0 && mHeight != 0){
             createChildren();
@@ -174,7 +174,7 @@ public class PuzzleLayout extends RelativeLayout {
     // El modelo actualiza la posición actual sincrónicamente cada vez que se intercambia la posición de vista secundaria.
     private void createChildren(){
         removeAllViews();
-        mHelper.establecerNumeroCortes(mSquareRootNum);
+        ph.establecerNumeroCortes(numCortes);
 
         DisplayMetrics dm = getResources().getDisplayMetrics();
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -184,11 +184,11 @@ public class PuzzleLayout extends RelativeLayout {
         Bitmap bitmap = escalarImagen(resource, mWidth, mHeight);
         resource.recycle();
 
-        mItemWidth = mWidth / mSquareRootNum;
-        mItemHeight = mHeight / mSquareRootNum;
+        mItemWidth = mWidth / numCortes;
+        mItemHeight = mHeight / numCortes;
 
-        for (int i = 0; i < mSquareRootNum; i++){
-            for (int j = 0; j < mSquareRootNum; j++){
+        for (int i = 0; i < numCortes; i++){
+            for (int j = 0; j < numCortes; j++){
                 ImageView iv = new ImageView(getContext());
                 iv.setScaleType(ImageView.ScaleType.FIT_XY);
                 RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -214,22 +214,22 @@ public class PuzzleLayout extends RelativeLayout {
     }
 
     public void randomOrder(){
-        int num = mSquareRootNum * mSquareRootNum * 8;
+        int num = numCortes * numCortes * 8;
         View invisibleView = getChildAt(0);
         View neighbor;
         for (int i = 0; i < num; i ++){
-            int neighborPosition = mHelper.encontrarIndiceVecinoPiezaVacia();
+            int neighborPosition = ph.encontrarIndiceVecinoPiezaVacia();
             ViewGroup.LayoutParams invisibleLp = invisibleView.getLayoutParams();
             neighbor = getChildAt(neighborPosition);
             invisibleView.setLayoutParams(neighbor.getLayoutParams());
             neighbor.setLayoutParams(invisibleLp);
-            mHelper.intercambiarPosicionConPiezaVacia(neighborPosition);
+            ph.intercambiarPosicionConPiezaVacia(neighborPosition);
         }
         invisibleView.setVisibility(INVISIBLE);
     }
 
     public void setOnCompleteCallback(OnCompleteCallback onCompleteCallback){
-        mOnCompleteCallback = onCompleteCallback;
+        occ = onCompleteCallback;
     }
 
     public interface OnCompleteCallback{

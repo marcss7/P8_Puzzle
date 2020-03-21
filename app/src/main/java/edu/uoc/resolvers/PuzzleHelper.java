@@ -8,7 +8,7 @@ import java.util.Random;
     Esta clase contiene una serie de métodos que nos va a
     permitir manipular las piezas del puzzle dentro del layout.
  */
-public class PuzzleHelper {
+class PuzzleHelper {
 
     static final int POSICION_ACTUAL = -1;
     static final int IZQUIERDA = 0;
@@ -82,7 +82,7 @@ public class PuzzleHelper {
 
     // Este método nos devuelve la pieza del listado
     // de piezas cuyo índice le pasamos por parámetro.
-    public Pieza obtenerPieza(int indice){
+    Pieza obtenerPieza(int indice){
         return piezas.get(indice);
     }
 
@@ -99,7 +99,7 @@ public class PuzzleHelper {
 
     // Este método consulta aleatoriamente el índice
     // de una pieza alrededor de la posición vacía.
-    public int encontrarIndiceVecinoPiezaVacia() {
+    int encontrarIndiceVecinoPiezaVacia() {
         Pieza piezaVacia = piezas.get(0);
         int posicion = piezaVacia.posicion;
         int x = posicion % numCortes;
