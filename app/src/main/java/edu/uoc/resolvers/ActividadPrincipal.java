@@ -23,7 +23,7 @@ import java.util.Date;
 public class ActividadPrincipal extends AppCompatActivity implements Runnable {
     PuzzleLayout pl;
     int numCortes = 2;
-    int imagen = R.mipmap.pic_02;
+    int imagen = R.mipmap.img_02;
     long tInicio, tFin, tDelta;
     String fechaActual;
     String patronFecha = "dd/MM/yyyy";
@@ -35,7 +35,7 @@ public class ActividadPrincipal extends AppCompatActivity implements Runnable {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.actividad_principal);
         pl = findViewById(R.id.tablero_juego);
         pl.setImage(imagen, numCortes);
 
@@ -117,8 +117,9 @@ public class ActividadPrincipal extends AppCompatActivity implements Runnable {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 numCortes = 2;
-                                imagen = R.mipmap.pic_02;
+                                imagen = R.mipmap.img_02;
                                 pl.setImage(imagen, numCortes);
+                                tInicio = System.currentTimeMillis();
                             }
                         }).setNegativeButton(R.string.salir,
                 new DialogInterface.OnClickListener() {
