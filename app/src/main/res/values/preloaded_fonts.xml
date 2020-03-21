@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="preloaded_fonts" translatable="false">
-        <item>@font/amatic_sc_bold</item>
-        <item>@font/comfortaa_bold</item>
         <item>@font/passion_one</item>
         <item>@font/passion_one_bold</item>
     </array>

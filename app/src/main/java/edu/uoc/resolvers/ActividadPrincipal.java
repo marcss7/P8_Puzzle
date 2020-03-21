@@ -12,10 +12,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -24,15 +20,11 @@ import java.util.Date;
 /*
     Esta clase representa la pantalla de juego.
  */
-public class ActividadPrincipal extends AppCompatActivity implements Runnable, View.OnTouchListener {
+public class ActividadPrincipal extends AppCompatActivity implements Runnable {
     PuzzleLayout pl;
-    TextView tvTips;
-    ImageView ivTips;
     int numCortes = 2;
     int imagen = R.mipmap.pic_02;
-    long tInicio;
-    long tFin;
-    long tDelta;
+    long tInicio, tFin, tDelta;
     String fechaActual;
     String patronFecha = "dd/MM/yyyy";
     SimpleDateFormat sdf;
@@ -44,11 +36,7 @@ public class ActividadPrincipal extends AppCompatActivity implements Runnable, V
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ivTips = findViewById(R.id.iv_tips);
-        ivTips.setImageResource(imagen);
-        tvTips = findViewById(R.id.tv_tips);
-        tvTips.setOnTouchListener(this);
-        pl = findViewById(R.id.activity_swipe_card);
+        pl = findViewById(R.id.tablero_juego);
         pl.setImage(imagen, numCortes);
 
         // Empezamos a contar el tiempo
@@ -88,7 +76,7 @@ public class ActividadPrincipal extends AppCompatActivity implements Runnable, V
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
+        inflater.inflate(R.menu.menu_principal, menu);
         return true;
     }
 
@@ -115,7 +103,6 @@ public class ActividadPrincipal extends AppCompatActivity implements Runnable, V
         if(numCortes > NIVELES + 1){
             showDialog();
         }else {
-            ivTips.setImageResource(imagen);
             pl.setImage(imagen, numCortes);
         }
     }
@@ -131,29 +118,16 @@ public class ActividadPrincipal extends AppCompatActivity implements Runnable, V
                             public void onClick(DialogInterface dialog, int which) {
                                 numCortes = 2;
                                 imagen = R.mipmap.pic_02;
-                                ivTips.setImageResource(imagen);
                                 pl.setImage(imagen, numCortes);
                             }
                         }).setNegativeButton(R.string.salir,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent i = new Intent(ActividadPrincipal.this,StartActivity.class);
+                        Intent i = new Intent(ActividadPrincipal.this, ActividadInicio.class);
                         startActivityForResult(i, SECOND_ACTIVITY_REQUEST_CODE);
                         finish();
                     }
                 }).show();
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        switch (event.getAction()){
-            case MotionEvent.ACTION_DOWN:
-                ivTips.setVisibility(View.VISIBLE);
-                break;
-            default:
-                ivTips.setVisibility(View.GONE);
-        }
-        return true;
     }
 }
