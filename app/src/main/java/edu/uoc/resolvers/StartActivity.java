@@ -62,7 +62,7 @@ public class StartActivity extends AppCompatActivity {
 
     // Al hacer clic en el botón nos lleva a la pantalla principal del juego
     public void openMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, ActividadPrincipal.class);
         startActivity(intent);
     }
 }

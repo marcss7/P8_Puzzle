@@ -21,68 +21,70 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
-// Esta clase representa la pantalla de juego
-public class MainActivity extends AppCompatActivity implements Runnable, View.OnTouchListener {
-    PuzzleLayout puzzleLayout;
+/*
+    Esta clase representa la pantalla de juego.
+ */
+public class ActividadPrincipal extends AppCompatActivity implements Runnable, View.OnTouchListener {
+    PuzzleLayout pl;
     TextView tvTips;
     ImageView ivTips;
-    int squareRootNum = 2;
-    int drawableId = R.mipmap.pic_02;
-    long tStart;
-    long tEnd;
+    int numCortes = 2;
+    int imagen = R.mipmap.pic_02;
+    long tInicio;
+    long tFin;
     long tDelta;
-    String currentDate;
-    String pattern;
-    SimpleDateFormat simpleDateFormat;
-    double elapsedSeconds;
+    String fechaActual;
+    String patronFecha = "dd/MM/yyyy";
+    SimpleDateFormat sdf;
+    double segTranscurridos;
     private static final int SECOND_ACTIVITY_REQUEST_CODE = 0;
+    private static final int NIVELES = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ivTips = findViewById(R.id.iv_tips);
-        ivTips.setImageResource(drawableId);
+        ivTips.setImageResource(imagen);
         tvTips = findViewById(R.id.tv_tips);
         tvTips.setOnTouchListener(this);
-        puzzleLayout = findViewById(R.id.activity_swipe_card);
-        puzzleLayout.setImage(drawableId, squareRootNum);
+        pl = findViewById(R.id.activity_swipe_card);
+        pl.setImage(imagen, numCortes);
+
         // Empezamos a contar el tiempo
-        tStart = System.currentTimeMillis();
+        tInicio = System.currentTimeMillis();
         final BBDDHelper dbHelper = new BBDDHelper(this);
-        puzzleLayout.setOnCompleteCallback(new PuzzleLayout.OnCompleteCallback() {
+        pl.setOnCompleteCallback(new PuzzleLayout.OnCompleteCallback() {
             @Override
             public void onComplete() {
                 // Paramos el tiempo
-                tEnd = System.currentTimeMillis();
-                pattern = "dd/MM/yyyy";
-                simpleDateFormat = new SimpleDateFormat(pattern);
-                currentDate = simpleDateFormat.format(new Date(tEnd));
-                tDelta = tEnd - tStart;
-                elapsedSeconds = tDelta / 1000.0;
+                tFin = System.currentTimeMillis();
+                sdf = new SimpleDateFormat(patronFecha);
+                fechaActual = sdf.format(new Date(tFin));
+                tDelta = tFin - tInicio;
+                segTranscurridos = tDelta / 1000.0;
 
-                // Gets the data repository in write mode
+                // Obtenemos la BBDD
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-                // Create a new map of values, where column names are the keys
-                ContentValues values = new ContentValues();
-                values.put(BBDDEsquema.COLUMNA_FECHA, String.valueOf(currentDate));
-                values.put(BBDDEsquema.COLUMNA_NIVEL, squareRootNum - 1);
-                values.put(BBDDEsquema.COLUMNA_PUNTOS, elapsedSeconds);
+                // Insertamos la puntuación en la BBDD
+                ContentValues valores = new ContentValues();
+                valores.put(BBDDEsquema.COLUMNA_FECHA, String.valueOf(fechaActual));
+                valores.put(BBDDEsquema.COLUMNA_NIVEL, numCortes - 1);
+                valores.put(BBDDEsquema.COLUMNA_PUNTOS, segTranscurridos);
 
-                // Insert the new row, returning the primary key value of the new row
-                long newRowId = db.insert(BBDDEsquema.NOMBRE_TABLA, null, values);
+                long idNuevaFila = db.insert(BBDDEsquema.NOMBRE_TABLA, null, valores);
 
                 // Mostramos mensaje al completar puzzle
-                Toast.makeText(MainActivity.this, "¡Bravo! Tu tiempo " + String.format("%.2f", elapsedSeconds).replace(".", ",") + "s", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ActividadPrincipal.this, "¡Bravo! Tu tiempo " + String.format("%.2f", segTranscurridos).replace(".", ",") + "s", Toast.LENGTH_SHORT).show();
+
                 // Esperamos 3 segundos para cargar el siguiente puzzle
-                puzzleLayout.postDelayed(MainActivity.this, 3000);
+                pl.postDelayed(ActividadPrincipal.this, 3000);
             }
         });
     }
 
-    // Creamos menú selección de la barra de acción
+    // Este método crea el menú selección de la barra de acción
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -90,14 +92,14 @@ public class MainActivity extends AppCompatActivity implements Runnable, View.On
         return true;
     }
 
-    // Disparamos la acción correspondiente al elegir cada opción del menú
+    // Este método dispara la acción correspondiente al elegir cada opción del menú.
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.ayuda:
                 // Se abre la WebView con la ayuda
-                Intent help = new Intent(this, HelpActivity.class);
-                startActivity(help);
+                Intent ayuda = new Intent(this, ActividadAyuda.class);
+                startActivity(ayuda);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -106,36 +108,37 @@ public class MainActivity extends AppCompatActivity implements Runnable, View.On
 
     @Override
     public void run() {
-        squareRootNum++;
-        drawableId++;
+        numCortes++;
+        imagen++;
         // Si llegamos al último puzzle muestra el dialogo del fin del juego
         // Si no carga el siguiente puzzle
-        if(squareRootNum > 3){
+        if(numCortes > NIVELES + 1){
             showDialog();
         }else {
-            ivTips.setImageResource(drawableId);
-            puzzleLayout.setImage(drawableId, squareRootNum);
+            ivTips.setImageResource(imagen);
+            pl.setImage(imagen, numCortes);
         }
     }
 
+    // Este método muestra el diálogo de finalización del juego.
     private void showDialog() {
-        new AlertDialog.Builder(MainActivity.this)
-                .setTitle(R.string.success)
-                .setMessage(R.string.restart)
+        new AlertDialog.Builder(ActividadPrincipal.this)
+                .setTitle(R.string.exito)
+                .setMessage(R.string.reiniciar)
                 .setPositiveButton(R.string.ok,
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                squareRootNum = 2;
-                                drawableId = R.mipmap.pic_02;
-                                ivTips.setImageResource(drawableId);
-                                puzzleLayout.setImage(drawableId, squareRootNum);
+                                numCortes = 2;
+                                imagen = R.mipmap.pic_02;
+                                ivTips.setImageResource(imagen);
+                                pl.setImage(imagen, numCortes);
                             }
-                        }).setNegativeButton(R.string.exit,
+                        }).setNegativeButton(R.string.salir,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent i = new Intent(MainActivity.this,StartActivity.class);
+                        Intent i = new Intent(ActividadPrincipal.this,StartActivity.class);
                         startActivityForResult(i, SECOND_ACTIVITY_REQUEST_CODE);
                         finish();
                     }
