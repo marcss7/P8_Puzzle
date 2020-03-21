@@ -20,6 +20,7 @@ public class BBDDHelper extends SQLiteOpenHelper {
         db.execSQL(BBDDEsquema.SQL_BORRAR_ENTRADAS);
         onCreate(db);
     }
+
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
@@ -28,4 +29,5 @@ public class BBDDHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(BBDDEsquema.SQL_CREAR_ENTRADAS);
     }
+
 }

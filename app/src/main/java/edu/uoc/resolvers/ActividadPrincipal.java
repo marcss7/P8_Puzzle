@@ -21,14 +21,14 @@ import java.util.Date;
     Esta clase representa la pantalla de juego.
  */
 public class ActividadPrincipal extends AppCompatActivity implements Runnable {
-    PuzzleLayout pl;
-    int numCortes = 2;
-    int imagen = R.mipmap.img_02;
-    long tInicio, tFin, tDelta;
-    String fechaActual;
-    String patronFecha = "dd/MM/yyyy";
-    SimpleDateFormat sdf;
-    double segTranscurridos;
+    private PuzzleLayout pl;
+    private int numCortes = 2;
+    private int imagen = R.mipmap.img_02;
+    private long tInicio, tFin, tDelta;
+    private String fechaActual;
+    private String patronFecha = "dd/MM/yyyy";
+    private SimpleDateFormat sdf;
+    private double segTranscurridos;
     private static final int SECOND_ACTIVITY_REQUEST_CODE = 0;
     private static final int NIVELES = 5;
 

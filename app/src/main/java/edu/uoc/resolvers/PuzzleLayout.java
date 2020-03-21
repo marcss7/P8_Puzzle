@@ -65,7 +65,7 @@ public class PuzzleLayout extends RelativeLayout {
 
         vdh = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
 
-            // Este método permite captura la pieza que queremos mover
+            // Este método permite capturar la pieza que queremos mover
             @Override
             public boolean tryCaptureView(View child, int pointerId) {
                 int indice = indexOfChild(child);
@@ -116,7 +116,7 @@ public class PuzzleLayout extends RelativeLayout {
                 int bordeInferior = arribaPieza + alturaPieza;
                 int direccion = ph.obtenerPosicionDesplazamiento(indice);
 
-                switch (direccion){
+                switch (direccion) {
                     case PuzzleHelper.ARRIBA:
                         if(arriba <= bordeSuperior)
                             return bordeSuperior;
@@ -159,7 +159,7 @@ public class PuzzleLayout extends RelativeLayout {
     }
 
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent event){
+    public boolean onInterceptTouchEvent(MotionEvent event) {
         return vdh.shouldInterceptTouchEvent(event);
     }
 
@@ -178,7 +178,7 @@ public class PuzzleLayout extends RelativeLayout {
 
     // Esté método trocea la imagen que toca en función
     // del número de cortes que se le pasan por parámetro.
-    public void establecerImagen(int idImagen, int numCortes){
+    public void establecerImagen(int idImagen, int numCortes) {
         this.numCortes = numCortes;
         this.idImagen = idImagen;
         if(anchuraImagen != 0 && alturaImagen != 0){
@@ -187,7 +187,7 @@ public class PuzzleLayout extends RelativeLayout {
     }
 
     // Este método crea las piezas del puzzle y las desordena.
-    private void crearPiezas(){
+    private void crearPiezas() {
         removeAllViews();
         ph.establecerNumeroCortes(numCortes);
 
@@ -202,8 +202,8 @@ public class PuzzleLayout extends RelativeLayout {
         anchuraPieza = anchuraImagen / numCortes;
         alturaPieza = alturaImagen / numCortes;
 
-        for (int i = 0; i < numCortes; i++){
-            for (int j = 0; j < numCortes; j++){
+        for (int i = 0; i < numCortes; i++) {
+            for (int j = 0; j < numCortes; j++) {
                 ImageView iv = new ImageView(getContext());
                 iv.setScaleType(ImageView.ScaleType.FIT_XY);
                 RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -230,12 +230,12 @@ public class PuzzleLayout extends RelativeLayout {
     }
 
     // Este método desordena las piezas.
-    public void desordenarPiezas(){
+    private void desordenarPiezas() {
         int num = numCortes * numCortes * 8;
         View piezaVacia = getChildAt(0);
         View vistaVecina;
 
-        for (int i = 0; i < num; i ++){
+        for (int i = 0; i < num; i ++) {
             int posicionVecina = ph.encontrarIndiceVecinoPiezaVacia();
             ViewGroup.LayoutParams lpPiezaVacia = piezaVacia.getLayoutParams();
             vistaVecina = getChildAt(posicionVecina);
@@ -248,11 +248,11 @@ public class PuzzleLayout extends RelativeLayout {
     }
 
     // Este método dispara los acontecimientos que ocurren cuando se completa el puzzle.
-    public void setOnCompleteCallback(OnCompleteCallback onCompleteCallback){
+    public void setOnCompleteCallback(OnCompleteCallback onCompleteCallback) {
         occ = onCompleteCallback;
     }
 
-    public interface OnCompleteCallback{
+    public interface OnCompleteCallback {
         void onComplete();
     }
 

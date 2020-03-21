@@ -28,8 +28,8 @@ class PuzzleHelper {
     private void resetearPosicionPiezas() {
         piezas.clear();
         int posicion = 0;
-        for (int i = 0; i < numCortes; i++){
-            for (int j = 0; j < numCortes; j++){
+        for (int i = 0; i < numCortes; i++) {
+            for (int j = 0; j < numCortes; j++) {
                 piezas.add(new Pieza(posicion, i, j));
                 posicion ++;
             }
@@ -38,14 +38,14 @@ class PuzzleHelper {
 
     // Este método establece el número de cortes que se harán al
     // puzzle así como el listado de piezas y sus posiciones.
-    void establecerNumeroCortes(int numCortes){
+    void establecerNumeroCortes(int numCortes) {
         this.numCortes = numCortes;
         resetearPosicionPiezas();
     }
 
     // Este método intercambia la posición de la pieza que queremos mover
     // con la vacía y comprueba si se ha completado el puzzle.
-    boolean intercambiarPosicionConPiezaVacia(int indice){
+    boolean intercambiarPosicionConPiezaVacia(int indice) {
         Pieza pieza = piezas.get(indice);
         Pieza piezaVacia = piezas.get(0);
         intercambiarPosiciones(pieza, piezaVacia);
@@ -82,13 +82,13 @@ class PuzzleHelper {
 
     // Este método nos devuelve la pieza del listado
     // de piezas cuyo índice le pasamos por parámetro.
-    Pieza obtenerPieza(int indice){
+    Pieza obtenerPieza(int indice) {
         return piezas.get(indice);
     }
 
     // Este método nos devuelve el índice de una
     // pieza en función de su posición actual.
-    private int obtenerIndicePorPosicionActual(int posicionActual){
+    private int obtenerIndicePorPosicionActual(int posicionActual) {
         int numPiezas = numCortes * numCortes;
         for (int i = 0; i < numPiezas; i++) {
             if(piezas.get(i).posicion == posicionActual)
@@ -125,7 +125,7 @@ class PuzzleHelper {
 
     // Esté método devuelve la posición a la que se puede mover la pieza
     // cuyo índice le pasamos. Si no se puede mover devuelve su posición actual.
-    int obtenerPosicionDesplazamiento(int indice){
+    int obtenerPosicionDesplazamiento(int indice) {
 
         Pieza pieza = piezas.get(indice);
         int posicion = pieza.posicion;
