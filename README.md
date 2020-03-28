@@ -1,3 +1,3 @@
-# TheResolvers - Manual de usuario
+# TheResolvers
 
-En este tutorial encontrarás todo lo que necesitas saber para empezar a resolver los puzzles.
+En este repositorio se encuentra el código correspondiente al Producto 1 del proyecto P8 - Desarrollo de aplicaciones móviles nativas.
